@@ -2,6 +2,7 @@
 #
 
 import sys
+import logging
 import pdb
 
 from math import log, pow, floor
@@ -9,12 +10,13 @@ from math import log, pow, floor
 from hashlib import sha1 as sha
 
 class MerkleTree:
-    
+
     def __init__(self, hashes=None):
         """
         Create a Merkle hash tree
         """
         self.root_hash = None
+        self.logger = None
         if hashes is not None:
             hashes_len = len(hashes)
         if hashes_len > 0:
@@ -25,6 +27,31 @@ class MerkleTree:
             self._build_tree(hashes)
             self.root_hash = self.tree[0]
 
+            if not self.logger:
+                self._init_logger()
+
+#           pdb.set_trace()
+            self.logger.info("Merkle Tree created")
+
+    def _init_logger(self):
+        # create logger
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+
+        # create console handler and set level to debug
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+
+        # create formatter
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        # add formatter to ch
+        ch.setFormatter(formatter)
+
+        # add ch to logger
+        self.logger.addHandler(ch)
+
+    
     def _set_tree_height(self, n):
         height = log(n, 2)
         if height - floor(height) > 0.0:
@@ -183,8 +210,8 @@ if __name__ == '__main__':
     for i in range(0, 13):
         d = sha(strings[i])
         hs.append(d.hexdigest())
-    print 'hashes before Merkle Tree: {0}\n'.format(hs)
     mt = MerkleTree(hashes=hs)
-    print 'root hash: {0}\n'.format(mt.get_root_hash())
-    print 'Merkle Tree hashes: {0}\n'.format(mt.tree)
-    print 'Merkle Tree hashes @ {0}: {1}\n'.format(3, mt.get_hashes(3))
+    mt.logger.info('hashes before Merkle Tree: {0}\n'.format(hs))
+    mt.logger.info('root hash: {0}\n'.format(mt.get_root_hash()))
+    mt.logger.info('Merkle Tree hashes: {0}\n'.format(mt.tree))
+    mt.logger.info('Merkle Tree hashes @ {0}: {1}\n'.format(3, mt.get_hashes(3)))
