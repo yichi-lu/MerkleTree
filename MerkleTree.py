@@ -142,17 +142,8 @@ class MerkleTree:
     def check_hashes(self, hashlist):
         return self.check_tree_path(hashlist)
 
-    def update_hash_admin(self,hashlist,piece_hashes):
-        update_hash_admin(hashlist,self.tree,self.treeheight,piece_hashes)
-
 
     def check_tree_path(self, hashlist):
-        """
-        The hashes should be in the right order in the hashlist, otherwise
-        the peer will be kicked. The hashlist parameter is assumed to be
-        of the right type, and contain values of the right type as well.
-        The exact values should be checked for validity here.
-        """
         maxoffset = int(pow(2, self.height + 1) - 2)
         mystartoffset = int(pow(2, self.height) - 1)
         i = 0
@@ -177,32 +168,6 @@ class MerkleTree:
         else:
             return False
 
-def update_hash_admin(hashlist,tree,height,hashes):
-    mystartoffset = int(pow(2,height)-1)
-    for i in range(0,len(hashlist)):
-        if i < 2:
-            # me and sibling real hashes of piece data, save them
-            index = hashlist[i][0]-mystartoffset
-            # ignore siblings that are just tree filler
-            if index < len(hashes):
-                hashes[index] = hashlist[i][1]
-        # put all hashes in tree, such that we incrementally learn it 
-        # and can pass them on to others
-        tree[hashlist[i][0]] = hashlist[i][1]
-
-
-def check_fork(a,b,level):
-    myoffset = a[0]
-    siblingoffset = b[0]
-    if myoffset > siblingoffset:
-        data = b[1]+a[1]
-    else:
-        data = a[1]+b[1]
-    digester = sha()
-    digester.update(data)
-    digest = digester.digest()
-    [parentstartoffset, parentoffset ] = get_parent_offset(myoffset,level-1)
-    return [parentoffset,digest]
 
 if __name__ == '__main__':
     hs = []
