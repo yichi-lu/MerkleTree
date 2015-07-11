@@ -8,8 +8,6 @@ from math import log, pow, floor
 # from hashlib import sha256 as sha
 from hashlib import sha1 as sha
 
-DEBUG = False
-
 class MerkleTree:
     
     def __init__(self, hashes=None):
@@ -28,16 +26,12 @@ class MerkleTree:
             self.root_hash = self.tree[0]
 
     def _set_tree_height(self, n):
-        if DEBUG:
-            print >> sys.stdout, "Merkle Tree: hash length is", n
         height = log(n, 2)
         if height - floor(height) > 0.0:
             # height is not a whole number
             self.height = int(height) + 1
         else:
             self.height = int(height)
-        if DEBUG:
-            print >> sys.stdout, "Merkle Tree: tree height is", self.height
 
 
     def _init_tree(self, height):
@@ -49,8 +43,6 @@ class MerkleTree:
         # the tree is implemented as a list
         #
         treesize = int(pow(2, height + 1) - 1)
-        if DEBUG:
-            print >> sys.stderr, "Merkle Tree: treesize", treesize
         self.tree = ['' ] * treesize
 
 
@@ -59,8 +51,6 @@ class MerkleTree:
         treesize = int(pow(2, self.height + 1) - 1)
         number_of_leaves = int(pow(2, self.height))
         start = number_of_leaves - 1
-        if DEBUG:
-            print >> sys.stderr,"Merkle Tree: bottom of tree starts at", startoffset
         # hashes are held at leaves
         for i in range(start, start + hashes_len):
             self.tree[i] = hashes[i - start]
@@ -89,8 +79,6 @@ class MerkleTree:
         if level == 1:
             return 0
         [parentstartoffset, parentoffset ] = self._get_parent_offset(offset, level - 1)
-        if DEBUG:
-            print >> sys.stderr,"merkle: parent offset",parentoffset        
         parentindex = parentoffset - parentstartoffset
         if parentoffset % 2 == 0:
             uncleoffset = parentoffset - 1
@@ -170,8 +158,6 @@ def update_hash_admin(hashlist,tree,height,hashes):
             index = hashlist[i][0]-mystartoffset
             # ignore siblings that are just tree filler
             if index < len(hashes):
-                if DEBUG:
-                    print >> sys.stderr,"merkle: update_hash_admin: saving hash of",index
                 hashes[index] = hashlist[i][1]
         # put all hashes in tree, such that we incrementally learn it 
         # and can pass them on to others
@@ -183,12 +169,8 @@ def check_fork(a,b,level):
     siblingoffset = b[0]
     if myoffset > siblingoffset:
         data = b[1]+a[1]
-        if DEBUG:
-            print >> sys.stderr,"merkle: combining",siblingoffset,myoffset
     else:
         data = a[1]+b[1]
-        if DEBUG:
-            print >> sys.stderr,"merkle: combining",myoffset,siblingoffset
     digester = sha()
     digester.update(data)
     digest = digester.digest()
