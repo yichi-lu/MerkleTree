@@ -9,7 +9,7 @@ from math import log, pow, floor
 # from hashlib import sha256 as sha
 from hashlib import sha1 as sha
 
-class MerkleTree:
+class MerkleTree(object):
 
     def __init__(self, hashes=None):
         """
@@ -88,7 +88,6 @@ class MerkleTree:
         # higher level hashes from leaves
         for level in range(self.height, 0, -1):
             for i in range(int(pow(2, level) - 1), int(pow(2, level + 1) - 2), 2):
-                #print >> sys.stderr,"merkle: data offset",offset
                 (parentstartoffset, j) = self._get_parent_offset(i, level)
                 data = self.tree[i] + self.tree[i + 1]
                 d = sha(data)
