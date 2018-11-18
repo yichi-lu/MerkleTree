@@ -20,12 +20,9 @@ class TreeHash(object):
 
     def __init__(self, hashes=None):
         self.root_hash = None
-        self.logger = None
         self.height = -1    # tree height
         self.leaves = 0
-
-        if not self.logger:
-            self._init_logger()
+        self._init_logger()
 
         # update tree info
         hashes_len = 0
